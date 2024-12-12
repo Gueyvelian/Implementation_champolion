@@ -1,5 +1,10 @@
 package champollion;
 
+import java.util.Date;
+import java.util.LinkedList;
+
+import static java.lang.Math.round;
+
 /**
  * Un enseignant est caractérisé par les informations suivantes : son nom, son adresse email, et son service prévu,
  * et son emploi du temps.
@@ -7,6 +12,9 @@ package champollion;
 public class Enseignant extends Personne {
 
     // TODO : rajouter les autres méthodes présentes dans le diagramme UML
+    LinkedList <ServicePrevu> listeHueres = new LinkedList<>();
+    float heure_totale = 0;
+    LinkedList <Intervention> listeHueresPlanifies = new LinkedList<>();
 
     public Enseignant(String nom, String email) {
         super(nom, email);
@@ -21,8 +29,11 @@ public class Enseignant extends Personne {
      *
      */
     public int heuresPrevues() {
-        // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        float somme_des_heure_prevues = 0;
+        for (int i = 0; i < listeHueres.size(); i++) {
+            somme_des_heure_prevues = (float) (somme_des_heure_prevues + listeHueres.get(i).volumeCM*1.5 + listeHueres.get(i).volumeTD + listeHueres.get(i).volumeTP*0.75);
+        }
+        return round(somme_des_heure_prevues);
     }
 
     /**
@@ -35,8 +46,17 @@ public class Enseignant extends Personne {
      *
      */
     public int heuresPrevuesPourUE(UE ue) {
-        // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        ServicePrevu ue1;
+        float anciene_heure = heure_totale;
+        for (int i = 0; i < listeHueres.size(); i++) {
+            ue1 = listeHueres.get(i);
+            String intituleUe1=ue1.intitule;
+            if (intituleUe1.equals(ue.getIntitule())) {
+                heure_totale = (float) (listeHueres.get(i).volumeCM*1.5 + listeHueres.get(i).volumeTD + listeHueres.get(i).volumeTP*0.75);
+            }
+        }
+        return round(heure_totale)+round(anciene_heure);
+
     }
 
     /**
@@ -48,8 +68,31 @@ public class Enseignant extends Personne {
      * @param volumeTP le volume d'heures de TP
      */
     public void ajouteEnseignement(UE ue, int volumeCM, int volumeTD, int volumeTP) {
-        // TODO: Implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        this.listeHueres.add(new ServicePrevu(volumeCM, volumeTD, volumeTP, ue.getIntitule()));
+        //throw new UnsupportedOperationException("Pas encore implémenté");
     }
 
+    public boolean enSousService(){
+        if (heuresPrevues() < 192){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /*public void ajouteIntervention(Intervention inter){
+        TypeIntervention type = inter.typeIntervention;
+        if (type.equals(CM)){
+            if ()
+        }
+    }*/
+
+    public int resteAPlanifier(UE ue, TypeIntervention type){
+        if (heuresPrevuesPourUE(ue) > heuresPrevues()){
+            return heuresPrevuesPourUE(ue) - heuresPrevues();
+        }
+        else{
+            return 0;
+        }
+    }
 }
